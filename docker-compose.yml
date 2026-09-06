@@ -1,0 +1,9 @@
+services:
+  scrapdash:
+    build: .
+    ports:
+      - "8777:8777"
+    container_name: scrapdash
+    restart: unless-stopped
+    volumes:
+      - ./data:/app/data

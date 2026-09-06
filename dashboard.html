@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Scrapling Dashboard v2</title>
+<style>
+:root{--bg:#050505;--card:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);--accent:#22d3ee;--accent2:#a78bfa;--ok:#22c55e;--err:#ef4444;--txt:#f3f4f6;--dim:#9ca3af}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Inter',system-ui,sans-serif;background:var(--bg);color:var(--txt);min-height:100vh}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(600px circle at 20% 10%,rgba(34,211,238,.08),transparent),radial-gradient(600px circle at 80% 90%,rgba(167,139,250,.08),transparent);pointer-events:none;z-index:0}
+.wrap{max-width:1100px;margin:0 auto;padding:28px 20px 60px;position:relative;z-index:1}
+header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:12px}
+.logo{font-size:1.5rem;font-weight:800}.logo em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.badge{font-size:.7rem;padding:4px 12px;border-radius:99px;background:var(--card);border:1px solid var(--border);color:var(--dim)}
+.tabs{display:flex;gap:6px;margin-bottom:24px;background:var(--card);padding:5px;border-radius:12px;border:1px solid var(--border);width:fit-content}
+.tab{padding:9px 20px;border-radius:9px;cursor:pointer;font-size:.85rem;color:var(--dim);transition:.2s;border:none;background:transparent}
+.tab.on{background:rgba(34,211,238,.12);color:var(--accent);font-weight:600}
+.card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px;backdrop-filter:blur(12px)}
+label{display:block;font-size:.72rem;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
+input,select,textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--txt);font-size:.9rem;outline:none;transition:.2s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(34,211,238,.1)}
+textarea{resize:vertical;min-height:64px;font-family:inherit}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+.btn{background:linear-gradient(135deg,var(--accent),#0891b2);color:#000;border:none;border-radius:11px;padding:13px 26px;font-weight:700;font-size:.92rem;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
+.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(34,211,238,.3)}
+.btn:disabled{opacity:.45;cursor:wait;transform:none}
+.btn.ghost{background:var(--card);color:var(--txt);border:1px solid var(--border)}
+.btn.tg{background:linear-gradient(135deg,#2aabee,#1d8fd0);color:#fff}.btn.tg:hover{box-shadow:0 8px 24px rgba(42,171,238,.3)}
+.btn.sm{padding:9px 16px;font-size:.8rem}
+.btn.danger{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff}
+.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
+.stat .n{font-size:1.7rem;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat .l{font-size:.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
+.status{margin-top:14px;font-size:.85rem;min-height:22px;display:flex;align-items:center;gap:8px}
+.spin{width:15px;height:15px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+.progress{height:6px;background:rgba(255,255,255,.06);border-radius:99px;margin-top:12px;overflow:hidden}
+.progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;animation:ind 1.4s ease-in-out infinite;width:40%}
+@keyframes ind{0%{margin-left:-40%}100%{margin-left:100%}}
+table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:12px}
+th{color:var(--accent);text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em}
+td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#ccc;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+td .tag{display:inline-block;padding:2px 8px;border-radius:6px;background:rgba(34,211,238,.1);color:var(--accent);font-size:.72rem;margin:1px}
+.pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:.7rem;font-weight:600}
+.pill.done{background:rgba(34,197,94,.12);color:var(--ok)}.pill.error{background:rgba(239,68,68,.12);color:var(--err)}.pill.running{background:rgba(34,211,238,.12);color:var(--accent)}
+.pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
+.actions .btn{flex:1;min-width:130px}
+.empty{text-align:center;padding:40px;color:var(--dim);font-size:.9rem}
+h5{margin:18px 0 10px;color:var(--accent);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}
+@media(max-width:640px){.row,.row3,.stat-grid{grid-template-columns:1fr}.actions .btn{min-width:100%}}
+.hint{font-size:.72rem;color:#6b7280;margin-top:5px}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <div class="logo">🕷️ Scrapling <em>Dashboard</em></div>
+  <div class="badge">v2 • AI + Scheduler + Stealth</div>
+</header>
+
+<div class="tabs">
+  <button class="tab on" data-t="scrape">⚡ Scrape</button>
+  <button class="tab" data-t="sched">⏰ Scheduler</button>
+  <button class="tab" data-t="hist">📂 Riwayat</button>
+</div>
+
+<div id="tab-scrape">
+<div class="stat-grid">
+  <div class="stat"><div class="n" id="s-total">0</div><div class="l">Total Scrape</div></div>
+  <div class="stat"><div class="n" id="s-items">0</div><div class="l">Item Terkumpul</div></div>
+  <div class="stat"><div class="n" id="s-rate">-</div><div class="l">Status</div></div>
+</div>
+
+<div class="card">
+  <label>URL Target</label>
+  <input id="url" type="url" placeholder="https://contoh.com">
+  <div class="row" style="margin-top:14px">
+    <div><label>Mode Fetch</label>
+      <select id="mode">
+        <option value="http">⚡ HTTP (cepat)</option>
+        <option value="browser">🌐 Browser JS (React/SPA)</option>
+        <option value="stealth">🕵️ Stealth (anti-Cloudflare)</option>
+      </select>
+    </div>
+    <div><label>Pagination</label>
+      <select id="paginate"><option value="1">1 halaman</option><option value="3">3 halaman</option><option value="5">5 halaman</option><option value="10">10 halaman</option></select>
+    </div>
+  </div>
+  <div style="margin-top:14px"><label>⚡ Preset Situs Populer (klik otomatis isi)</label>
+    <select id="presetSel" onchange="applyPreset()" style="margin-bottom:12px">
+      <option value="">— Pilih preset —</option>
+      <option value="bmkg_quake">🚨 BMKG Gempa Terkini (JSON)</option>
+      <option value="bmkg_auto">🚨 BMKG Gempa M5.6+ (JSON)</option>
+      <option value="quotes">💬 Quotes to Scrape (belajar)</option>
+      <option value="hn">📰 Hacker News (berita tech)</option>
+      <option value="wiki">📚 Wikipedia Indonesia</option>
+    </select>
+  </div>
+  <div><label>CSS Selector (opsional)</label>
+    <input id="selector" placeholder=".product-item .name, table tr, article h2">
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px" id="selChecklist">
+      <button type="button" class="btn sm ghost" onclick="pickSel('.quote .text', '💬 Kutipan')">💬 Kutipan</button>
+      <button type="button" class="btn sm ghost" onclick="pickSel('h1, h2, h3', '📰 Judul/Heading')">📰 Judul</button>
+      <button type="button" class="btn sm ghost" onclick="pickSel('a', '🔗 Semua Link')">🔗 Link</button>
+      <button type="button" class="btn sm ghost" onclick="pickSel('img', '🖼️ Gambar')">🖼️ Gambar</button>
+      <button type="button" class="btn sm ghost" onclick="pickSel('table tr', '📊 Tabel')">📊 Tabel</button>
+      <button type="button" class="btn sm ghost" onclick="pickSel('.titleline > a', '📰 HN Berita')">📰 HN</button>
+      <button type="button" class="btn sm ghost" onclick="pickSel('.product-item .name', '🛒 Produk')">🛒 Produk</button>
+    </div>
+    <div class="hint">Klik preset selector → otomatis terisi. Atau kosongin = Smart Extract</div>
+  </div>
+  <div style="margin-top:14px"><label>🤖 AI Extraction (bahasa natural)</label>
+    <textarea id="prompt" placeholder="contoh: ambil semua nama produk, harga, dan rating"></textarea>
+    <div class="hint">Ketik apa yang mau diambil — AI cariin data terstruktur otomatis</div>
+  </div>
+  <label style="margin-top:14px;display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0">
+    <input type="checkbox" id="notify" checked style="width:auto"> 📲 Kirim hasil ke Telegram saat selesai
+  </label>
+  <div class="row" style="margin-top:14px">
+    <div><label>Format Output</label>
+      <select id="fmtSel">
+        <option value="csv">📊 CSV</option>
+        <option value="json">📋 JSON</option>
+        <option value="xlsx">📈 Excel</option>
+      </select>
+    </div>
+    <div><label>Pagination</label>
+      <select id="paginate"><option value="1">1 halaman</option><option value="3">3 halaman</option><option value="5">5 halaman</option><option value="10">10 halaman</option></select>
+    </div>
+  </div>
+  <button class="btn" id="btn" onclick="startScrape()" style="width:100%;margin-top:16px">🚀 Mulai Scrape</button>
+  <div class="status" id="status"></div>
+  <div class="progress" id="prog" style="display:none"><i></i></div>
+</div>
+
+<div class="card" id="resultCard" style="display:none">
+  <h4>📊 Hasil Scrape</h4>
+  <div class="meta" id="meta" style="font-size:.75rem;color:var(--dim);margin-bottom:8px"></div>
+  <div style="overflow-x:auto"><table id="tbl"></table></div>
+  <div class="actions">
+    <button class="btn sm" onclick="dl('csv')">⬇ CSV</button>
+    <button class="btn sm" onclick="dl('json')">⬇ JSON</button>
+    <button class="btn sm" onclick="dl('xlsx')">⬇ Excel</button>
+    <button class="btn sm tg" onclick="sendTG()">📨 Telegram</button>
+  </div>
+</div>
+</div>
+
+<div id="tab-sched" style="display:none">
+<div class="card">
+  <h4>⏰ Auto-Scrape Scheduler</h4>
+  <p style="font-size:.8rem;color:var(--dim);margin:8px 0 16px">Scrape otomatis tiap interval + hasil langsung ke Telegram</p>
+  <label>URL Target</label><input id="s-url" type="url" placeholder="https://contoh.com">
+  <div class="row3" style="margin-top:14px">
+    <div><label>Mode</label><select id="s-mode"><option value="http">HTTP</option><option value="browser">Browser JS</option><option value="stealth">Stealth</option></select></div>
+    <div><label>Selector (opsional)</label><input id="s-sel" placeholder=".title"></div>
+    <div><label>Interval (menit)</label><input id="s-int" type="number" value="60" min="5"></div>
+  </div>
+  <button class="btn" onclick="addSched()" style="width:100%;margin-top:16px">➕ Tambah Schedule</button>
+</div>
+<div class="card"><h4>📋 Schedule Aktif</h4><div id="schedList"><div class="empty">Belum ada schedule</div></div></div>
+</div>
+
+<div id="tab-hist" style="display:none">
+<div class="card">
+  <h4>📂 Riwayat Scrape</h4>
+  <div id="histList"><div class="empty">Loading...</div></div>
+</div>
+</div>
+</div>
+
+<script>
+let job=null;
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
+  ['scrape','sched','hist'].forEach(n=>document.getElementById('tab-'+n).style.display=t.dataset.t===n?'block':'none');
+  if(t.dataset.t==='hist')loadHist(); if(t.dataset.t==='sched')loadSched();
+});
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function pickSel(sel, label){
+  document.getElementById('selector').value = sel;
+  document.getElementById('status').innerHTML = '✅ Selector: ' + label;
+}
+const PRESETS = {
+  bmkg_quake: {url:'https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', mode:'http', selector:'', label:'BMKG Gempa Terkini'},
+  bmkg_auto: {url:'https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json', mode:'http', selector:'', label:'BMKG Gempa M5.6+'},
+  quotes: {url:'https://quotes.toscrape.com', mode:'http', selector:'.quote .text', label:'Quotes'},
+  hn: {url:'https://news.ycombinator.com', mode:'http', selector:'.titleline > a', label:'Hacker News'},
+  wiki: {url:'https://id.wikipedia.org/wiki/Indonesia', mode:'http', selector:'h2, h3', label:'Wikipedia'},
+};
+function applyPreset(){
+  const v = document.getElementById('presetSel').value;
+  if(!v || !PRESETS[v]) return;
+  const p = PRESETS[v];
+  document.getElementById('url').value = p.url;
+  document.getElementById('mode').value = p.mode;
+  document.getElementById('selector').value = p.selector;
+}
+async function stats(){
+  const h=await(await fetch('/api/history')).json();
+  document.getElementById('s-total').textContent=h.length;
+  document.getElementById('s-items').textContent=h.reduce((a,b)=>a+(b.item_count||0),0);
+  const done=h.filter(x=>x.status==='done').length;
+  document.getElementById('s-rate').textContent=h.length?Math.round(done/h.length*100)+'%':'-';
+  return h;
+}
+stats();
+async function startScrape(){
+  const url=document.getElementById('url').value.trim();
+  if(!url){alert('Isi URL dulu ges');return}
+  const btn=document.getElementById('btn');btn.disabled=true;
+  document.getElementById('prog').style.display='block';
+  document.getElementById('status').innerHTML='<span class="spin"></span>Job dikirim, scraping di background...';
+  document.getElementById('resultCard').style.display='none';
+  try{
+    const res=await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({url,mode:document.getElementById('mode').value,
+        selector:document.getElementById('selector').value.trim()||null,
+        prompt:document.getElementById('prompt').value.trim()||null,
+        paginate:+document.getElementById('paginate').value,
+        notify:document.getElementById('notify').checked})});
+    job=await res.json();
+    const poll=setInterval(async()=>{
+      const r=await fetch('/api/history/'+job.id);const d=await r.json();
+      if(d.status==='done'){
+        clearInterval(poll);document.getElementById('prog').style.display='none';
+        document.getElementById('status').innerHTML='✅ Selesai! '+d.item_count+' item terkumpul';
+        renderDetail(job.id,d);document.getElementById('resultCard').style.display='block';
+        btn.disabled=false;stats();
+      }else if(d.status==='error'){
+        clearInterval(poll);document.getElementById('prog').style.display='none';
+        document.getElementById('status').innerHTML='❌ Gagal: '+esc(d.error||'unknown');btn.disabled=false;
+      }
+    },2500);
+  }catch(e){document.getElementById('status').textContent='❌ '+e.message;document.getElementById('prog').style.display='none';btn.disabled=false}
+}
+function renderDetail(id,d){
+  document.getElementById('meta').textContent=(d.mode||'').toUpperCase()+' • '+d.url+' • '+new Date().toLocaleString('id-ID');
+  const tbl=document.getElementById('tbl');tbl.innerHTML='';
+  const data=d.data||[];if(!data.length){tbl.innerHTML='<tr><td class="empty">Tidak ada data</td></tr>';return}
+  if(typeof data[0]==='object'&&data[0]!==null){
+    const keys=Object.keys(data[0]);
+    tbl.innerHTML='<tr>'+keys.map(k=>'<th>'+esc(k)+'</th>').join('')+'</tr>'+
+      data.map(r=>'<tr>'+keys.map(k=>{let v=r[k];if(Array.isArray(v))v=v.join(', ');return '<td title="'+esc(v)+'">'+esc(v)+'</td>'}).join('')+'</tr>').join('');
+  }else{tbl.innerHTML=data.map(x=>'<tr><td>'+esc(x)+'</td></tr>').join('')}
+}
+function dl(fmt){if(!job)return;location.href='/api/download/'+job.id+'?format='+fmt}
+function dlDefault(){if(!job)return;const f=document.getElementById("fmtSel").value;location.href="/api/download/"+job.id+"?format="+f}
+async function sendTG(){
+  if(!job)return;const s=document.getElementById('status');
+  s.innerHTML='<span class="spin"></span>Mengirim...';
+  const r=await(await fetch('/api/telegram/'+job.id,{method:'POST'})).json();
+  s.textContent=r.ok?'✅ Terkirim ke Telegram!':'❌ '+JSON.stringify(r);
+}
+async function loadHist(){
+  const h=await(await fetch('/api/history')).json();
+  document.getElementById('histList').innerHTML=h.length?h.map(x=>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div style="min-width:0"><div style="font-size:.88rem;color:#eee;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.url)}</div>
+      <div style="font-size:.7rem;color:#666;margin-top:2px">${x.mode.toUpperCase()} • ${x.created_at}</div></div>
+      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
+        <span class="pill ${x.status}">${x.status}</span>
+        <span style="font-size:.8rem;color:var(--dim)">${x.item_count} item</span>
+        <button class="btn sm danger" onclick="delH(${x.id})">🗑</button></div>
+    </div>`).join(''):'<div class="empty">Belum ada riwayat</div>';
+}
+async function delH(id){if(!confirm('Hapus riwayat ini?'))return;await fetch('/api/history/'+id,{method:'DELETE'});loadHist()}
+async function loadSched(){
+  const s=await(await fetch('/api/schedules')).json();
+  document.getElementById('schedList').innerHTML=s.length?s.map(x=>
+    `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
+      <div style="min-width:0"><div style="font-size:.88rem">${esc(x.url)}</div>
+      <div style="font-size:.7rem;color:#666">tiap ${x.interval_min} menit • ${x.mode} • last: ${x.last_run||'belum jalan'}</div></div>
+      <button class="btn sm danger" onclick="delS(${x.id})">🗑</button></div>`).join(''):'<div class="empty">Belum ada schedule</div>';
+}
+async function addSched(){
+  const url=document.getElementById('s-url').value.trim();if(!url){alert('Isi URL');return}
+  await fetch('/api/schedules',{method:'POST',headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({url,mode:document.getElementById('s-mode').value,
+      selector:document.getElementById('s-sel').value.trim()||null,
+      interval_min:+document.getElementById('s-int').value})});
+  loadSched();
+}
+async function delS(id){await fetch('/api/schedules/'+id,{method:'DELETE'});loadSched()}
+</script>
+</body>
+</html>
