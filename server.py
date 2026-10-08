@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Optional, List
 from fastapi import FastAPI, HTTPException, BackgroundTasks, Request
 from fastapi.responses import HTMLResponse, StreamingResponse, JSONResponse
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 import httpx
 from concurrent.futures import ThreadPoolExecutor
@@ -16,6 +17,7 @@ SCHED_LOCK = threading.Lock()
 AUTH_DEFAULT = 'hans-scrap-2026'
 
 app = FastAPI(title='Scrapling Dashboard v3')
+app.add_middleware(CORSMiddleware, allow_origins=['*'], allow_methods=['*'], allow_headers=['*'])
 
 def db_init():
     con = sqlite3.connect(DB)
@@ -63,7 +65,24 @@ def set_setting(key, value):
     con.execute('INSERT OR REPLACE INTO settings(key,value) VALUES(?,?)', (key, value))
     con.commit(); con.close()
 
-AUTH_EXEMPT = {'/', '/api/auth'}
+AUTH_EXEMPT = {'/', '/api/auth', '/api/demo/extract', '/api/demo/samples'}
+
+# Public demo: fixed safe URLs so visitors can try it without an account.
+DEMO_SAMPLES = [
+    {'id': 'quotes', 'label': 'Quotes to Scrape', 'url': 'https://quotes.toscrape.com',
+     'prompt': 'Extract every quote with its author and tags'},
+    {'id': 'books', 'label': 'Books to Scrape', 'url': 'https://books.toscrape.com',
+     'prompt': 'Extract each book title, price and availability'},
+    {'id': 'hn', 'label': 'Hacker News', 'url': 'https://news.ycombinator.com',
+     'prompt': 'Extract the top stories: rank, title, points and comments'},
+]
+DEMO_URLS = {s['url'] for s in DEMO_SAMPLES}
+
+# simple in-memory rate limit for the public demo
+_demo_hits = {}
+_demo_lock = threading.Lock()
+DEMO_LIMIT = 5          # requests
+DEMO_WINDOW = 600       # seconds
 
 @app.middleware('http')
 async def auth_middleware(request: Request, call_next):
@@ -561,6 +580,37 @@ def api_ai_extract(req: AIExtractReq):
     except Exception as e:
         raise HTTPException(502, 'ai extract failed: ' + str(e))
     return {'url': req.url, 'model': MODELS[0], 'count': len(items) if isinstance(items, list) else 0, 'items': items}
+
+# ---------- Public demo (no auth) ----------
+@app.get('/api/demo/samples')
+def demo_samples():
+    return [{'id': s['id'], 'label': s['label'], 'prompt': s['prompt']} for s in DEMO_SAMPLES]
+
+class DemoReq(BaseModel):
+    sample: str
+
+@app.post('/api/demo/extract')
+def demo_extract(req: DemoReq, request: Request):
+    sample = next((s for s in DEMO_SAMPLES if s['id'] == req.sample), None)
+    if not sample:
+        raise HTTPException(400, 'unknown sample')
+    ip = (request.client.host if request.client else 'unknown')
+    now = time.time()
+    with _demo_lock:
+        hits = [t for t in _demo_hits.get(ip, []) if now - t < DEMO_WINDOW]
+        if len(hits) >= DEMO_LIMIT:
+            raise HTTPException(429, 'demo rate limit reached, try again later')
+        hits.append(now)
+        _demo_hits[ip] = hits
+    try:
+        resp = httpx.get(sample['url'], timeout=30, follow_redirects=True,
+                         headers={'User-Agent': 'Mozilla/5.0 (compatible; ScraplingDemo/1.0)'})
+        resp.raise_for_status()
+        html = resp.text
+        items = ai_extract(html, sample['prompt'])
+    except Exception as e:
+        raise HTTPException(502, 'demo failed: ' + str(e))
+    return {'sample': sample['id'], 'label': sample['label'], 'count': len(items) if isinstance(items, list) else 0, 'items': (items[:8] if isinstance(items, list) else items)}
 
 # ---------- History ----------
 @app.get('/api/history')
