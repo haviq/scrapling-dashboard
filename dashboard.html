@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Scrapling Dashboard v2</title>
+<title>Scrapling Dashboard v3</title>
 <style>
 :root{--bg:#050505;--card:rgba(255,255,255,.04);--border:rgba(255,255,255,.08);--accent:#22d3ee;--accent2:#a78bfa;--ok:#22c55e;--err:#ef4444;--txt:#f3f4f6;--dim:#9ca3af}
 *{margin:0;padding:0;box-sizing:border-box}
@@ -13,28 +13,28 @@ body::before{content:'';position:fixed;inset:0;background:radial-gradient(600px 
 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:30px;flex-wrap:wrap;gap:12px}
 .logo{font-size:1.5rem;font-weight:800}.logo em{font-style:normal;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .badge{font-size:.7rem;padding:4px 12px;border-radius:99px;background:var(--card);border:1px solid var(--border);color:var(--dim)}
-.tabs{display:flex;gap:6px;margin-bottom:24px;background:var(--card);padding:5px;border-radius:12px;border:1px solid var(--border);width:fit-content}
+.tabs{display:flex;gap:6px;margin-bottom:24px;background:var(--card);padding:5px;border-radius:12px;border:1px solid var(--border);width:fit-content;flex-wrap:wrap}
 .tab{padding:9px 20px;border-radius:9px;cursor:pointer;font-size:.85rem;color:var(--dim);transition:.2s;border:none;background:transparent}
 .tab.on{background:rgba(34,211,238,.12);color:var(--accent);font-weight:600}
 .card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px;margin-bottom:20px;backdrop-filter:blur(12px)}
 label{display:block;font-size:.72rem;color:var(--dim);margin-bottom:6px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
 input,select,textarea{width:100%;background:rgba(0,0,0,.3);border:1px solid var(--border);border-radius:10px;padding:11px 13px;color:var(--txt);font-size:.9rem;outline:none;transition:.2s}
-input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(34,211,238,.1)}
+input:focus,select:focus,textarea:focus{border-color:var(--accent)}
 textarea{resize:vertical;min-height:64px;font-family:inherit}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:14px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
 .btn{background:linear-gradient(135deg,var(--accent),#0891b2);color:#000;border:none;border-radius:11px;padding:13px 26px;font-weight:700;font-size:.92rem;cursor:pointer;transition:.2s;display:inline-flex;align-items:center;gap:8px;justify-content:center}
-.btn:hover:not(:disabled){transform:translateY(-1px);box-shadow:0 8px 24px rgba(34,211,238,.3)}
+.btn:hover:not(:disabled){transform:translateY(-1px)}
 .btn:disabled{opacity:.45;cursor:wait;transform:none}
 .btn.ghost{background:var(--card);color:var(--txt);border:1px solid var(--border)}
-.btn.tg{background:linear-gradient(135deg,#2aabee,#1d8fd0);color:#fff}.btn.tg:hover{box-shadow:0 8px 24px rgba(42,171,238,.3)}
+.btn.tg{background:linear-gradient(135deg,#2aabee,#1d8fd0);color:#fff}
 .btn.sm{padding:9px 16px;font-size:.8rem}
 .btn.danger{background:linear-gradient(135deg,#ef4444,#b91c1c);color:#fff}
-.stat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:20px}
 .stat{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 18px}
-.stat .n{font-size:1.7rem;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.stat .n{font-size:1.6rem;font-weight:800;background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
 .stat .l{font-size:.72rem;color:var(--dim);text-transform:uppercase;letter-spacing:.08em;margin-top:2px}
 .status{margin-top:14px;font-size:.85rem;min-height:22px;display:flex;align-items:center;gap:8px}
-.spin{width:15px;height:15px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite}
+.spin{width:15px;height:15px;border:2px solid var(--accent);border-top-color:transparent;border-radius:50%;animation:sp .7s linear infinite;display:inline-block}
 @keyframes sp{to{transform:rotate(360deg)}}
 .progress{height:6px;background:rgba(255,255,255,.06);border-radius:99px;margin-top:12px;overflow:hidden}
 .progress i{display:block;height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;animation:ind 1.4s ease-in-out infinite;width:40%}
@@ -42,249 +42,196 @@ textarea{resize:vertical;min-height:64px;font-family:inherit}
 table{width:100%;border-collapse:collapse;font-size:.82rem;margin-top:12px}
 th{color:var(--accent);text-align:left;padding:9px 10px;border-bottom:1px solid var(--border);font-size:.68rem;text-transform:uppercase;letter-spacing:.08em}
 td{padding:9px 10px;border-bottom:1px solid rgba(255,255,255,.04);color:#ccc;max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-td .tag{display:inline-block;padding:2px 8px;border-radius:6px;background:rgba(34,211,238,.1);color:var(--accent);font-size:.72rem;margin:1px}
 .pill{display:inline-flex;align-items:center;gap:5px;padding:3px 10px;border-radius:99px;font-size:.7rem;font-weight:600}
 .pill.done{background:rgba(34,197,94,.12);color:var(--ok)}.pill.error{background:rgba(239,68,68,.12);color:var(--err)}.pill.running{background:rgba(34,211,238,.12);color:var(--accent)}
 .pill::before{content:'';width:6px;height:6px;border-radius:50%;background:currentColor}
+.chg{color:#fbbf24;font-size:.72rem;font-weight:700}
 .actions{display:flex;gap:10px;margin-top:16px;flex-wrap:wrap}
 .actions .btn{flex:1;min-width:130px}
 .empty{text-align:center;padding:40px;color:var(--dim);font-size:.9rem}
-h5{margin:18px 0 10px;color:var(--accent);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}
-@media(max-width:640px){.row,.row3,.stat-grid{grid-template-columns:1fr}.actions .btn{min-width:100%}}
 .hint{font-size:.72rem;color:#6b7280;margin-top:5px}
+h5{margin:18px 0 10px;color:var(--accent);font-size:.85rem;text-transform:uppercase;letter-spacing:.06em}
+#toasts{position:fixed;top:18px;right:18px;z-index:99;display:flex;flex-direction:column;gap:8px}
+.toast{background:rgba(10,10,10,.92);border:1px solid var(--border);border-left:3px solid var(--accent);border-radius:10px;padding:12px 16px;font-size:.85rem;min-width:220px;max-width:340px;animation:tin .25s ease}
+.toast.ok{border-left-color:var(--ok)}.toast.err{border-left-color:var(--err)}
+@keyframes tin{from{transform:translateX(30px);opacity:0}to{transform:none;opacity:1}}
+#authScreen{position:fixed;inset:0;background:var(--bg);z-index:50;display:flex;align-items:center;justify-content:center}
+.authbox{width:340px;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:30px}
+@media(max-width:640px){.row,.row3,.stat-grid{grid-template-columns:1fr}.actions .btn{min-width:100%}}
 </style>
 </head>
 <body>
-<div class="wrap">
-<header>
-  <div class="logo">🕷️ Scrapling <em>Dashboard</em></div>
-  <div class="badge">v2 • AI + Scheduler + Stealth</div>
-</header>
-
-<div class="tabs">
-  <button class="tab on" data-t="scrape">⚡ Scrape</button>
-  <button class="tab" data-t="sched">⏰ Scheduler</button>
-  <button class="tab" data-t="hist">📂 Riwayat</button>
+<div id="toasts"></div>
+<div id="authScreen" style="display:none">
+  <div class="authbox">
+    <div class="logo" style="margin-bottom:6px">Scrap<em>Dash</em></div>
+    <div class="hint" style="margin-bottom:16px">Masukin token akses dulu ges</div>
+    <label>Token</label>
+    <input id="tokIn" type="password" placeholder="token akses">
+    <button class="btn" style="width:100%;margin-top:14px" onclick="doAuth()">Masuk</button>
+    <div class="hint" style="margin-top:10px">Default: hans-scrap-2026</div>
+  </div>
 </div>
-
+<div class="wrap" id="app" style="display:none">
+<header>
+  <div class="logo"><em>Scrapling</em> Dashboard</div>
+  <div style="display:flex;gap:8px;align-items:center">
+    <div class="badge">v3 Bulk + Deep + Diff</div>
+    <button class="btn sm ghost" onclick="logout()">Keluar</button>
+  </div>
+</header>
+<div class="tabs">
+  <button class="tab on" data-t="scrape">Scrape</button>
+  <button class="tab" data-t="bulk">Bulk Queue</button>
+  <button class="tab" data-t="sched">Scheduler</button>
+  <button class="tab" data-t="hist">Riwayat</button>
+</div>
 <div id="tab-scrape">
 <div class="stat-grid">
   <div class="stat"><div class="n" id="s-total">0</div><div class="l">Total Scrape</div></div>
   <div class="stat"><div class="n" id="s-items">0</div><div class="l">Item Terkumpul</div></div>
-  <div class="stat"><div class="n" id="s-rate">-</div><div class="l">Status</div></div>
+  <div class="stat"><div class="n" id="s-done">0</div><div class="l">Sukses</div></div>
+  <div class="stat"><div class="n" id="s-chg">0</div><div class="l">Data Berubah</div></div>
 </div>
-
 <div class="card">
   <label>URL Target</label>
   <input id="url" type="url" placeholder="https://contoh.com">
   <div class="row" style="margin-top:14px">
     <div><label>Mode Fetch</label>
       <select id="mode">
-        <option value="http">⚡ HTTP (cepat)</option>
-        <option value="browser">🌐 Browser JS (React/SPA)</option>
-        <option value="stealth">🕵️ Stealth (anti-Cloudflare)</option>
+        <option value="http">HTTP (cepat)</option>
+        <option value="browser">Browser JS (React/SPA)</option>
+        <option value="stealth">Stealth (anti-Cloudflare)</option>
+        <option value="gmaps">Google Maps Lead</option>
+        <option value="social">Social Crawler (X/IG/FB)</option>
       </select>
     </div>
-    <div><label>Pagination</label>
-      <select id="paginate"><option value="1">1 halaman</option><option value="3">3 halaman</option><option value="5">5 halaman</option><option value="10">10 halaman</option></select>
+    <div><label>Pagination (max 50, paralel)</label>
+      <select id="paginate"><option value="1">1 halaman</option><option value="3">3 halaman</option><option value="5">5 halaman</option><option value="10">10 halaman</option><option value="20">20 halaman</option><option value="50">50 halaman</option></select>
     </div>
   </div>
-  <div style="margin-top:14px"><label>⚡ Preset Situs Populer (klik otomatis isi)</label>
-    <select id="presetSel" onchange="applyPreset()" style="margin-bottom:12px">
-      <option value="">— Pilih preset —</option>
-      <option value="bmkg_quake">🚨 BMKG Gempa Terkini (JSON)</option>
-      <option value="bmkg_auto">🚨 BMKG Gempa M5.6+ (JSON)</option>
-      <option value="quotes">💬 Quotes to Scrape (belajar)</option>
-      <option value="hn">📰 Hacker News (berita tech)</option>
-      <option value="wiki">📚 Wikipedia Indonesia</option>
-    </select>
+  <div style="margin-top:14px;display:none" id="cookieBox">
+    <label>Cookies JSON (wajib buat Social)</label>
+    <textarea id="cookies" placeholder="Paste isi cookie dari Cookie-Editor..."></textarea>
   </div>
-  <div><label>CSS Selector (opsional)</label>
+  <div style="margin-top:14px">
+    <label>CSS Selector (opsional, kosongin = Smart Extract)</label>
     <input id="selector" placeholder=".product-item .name, table tr, article h2">
-    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px" id="selChecklist">
-      <button type="button" class="btn sm ghost" onclick="pickSel('.quote .text', '💬 Kutipan')">💬 Kutipan</button>
-      <button type="button" class="btn sm ghost" onclick="pickSel('h1, h2, h3', '📰 Judul/Heading')">📰 Judul</button>
-      <button type="button" class="btn sm ghost" onclick="pickSel('a', '🔗 Semua Link')">🔗 Link</button>
-      <button type="button" class="btn sm ghost" onclick="pickSel('img', '🖼️ Gambar')">🖼️ Gambar</button>
-      <button type="button" class="btn sm ghost" onclick="pickSel('table tr', '📊 Tabel')">📊 Tabel</button>
-      <button type="button" class="btn sm ghost" onclick="pickSel('.titleline > a', '📰 HN Berita')">📰 HN</button>
-      <button type="button" class="btn sm ghost" onclick="pickSel('.product-item .name', '🛒 Produk')">🛒 Produk</button>
-    </div>
-    <div class="hint">Klik preset selector → otomatis terisi. Atau kosongin = Smart Extract</div>
   </div>
-  <div style="margin-top:14px"><label>🤖 AI Extraction (bahasa natural)</label>
+  <div style="margin-top:14px">
+    <label>AI Extraction (bahasa natural)</label>
     <textarea id="prompt" placeholder="contoh: ambil semua nama produk, harga, dan rating"></textarea>
-    <div class="hint">Ketik apa yang mau diambil — AI cariin data terstruktur otomatis</div>
   </div>
   <label style="margin-top:14px;display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0">
-    <input type="checkbox" id="notify" checked style="width:auto"> 📲 Kirim hasil ke Telegram saat selesai
+    <input type="checkbox" id="deepChk" style="width:auto" onchange="deepToggle()"> Deep Scrape (ikut link detail, level 2)
   </label>
-  <div class="row" style="margin-top:14px">
-    <div><label>Format Output</label>
-      <select id="fmtSel">
-        <option value="csv">📊 CSV</option>
-        <option value="json">📋 JSON</option>
-        <option value="xlsx">📈 Excel</option>
-      </select>
+  <div id="deepBox" style="display:none;margin-top:14px">
+    <div class="row">
+      <div><label>Link Selector</label><input id="linkSel" placeholder="a.product-link (kosong = semua link)"></div>
+      <div><label>Max Link Diikuti (max 200)</label><input id="maxLinks" type="number" value="50" min="1" max="200"></div>
     </div>
-    <div><label>Pagination</label>
-      <select id="paginate"><option value="1">1 halaman</option><option value="3">3 halaman</option><option value="5">5 halaman</option><option value="10">10 halaman</option></select>
-    </div>
+    <div class="hint">Buat 1000+ items: aktifin ini + pagination. Link detail diambil paralel 8 thread.</div>
   </div>
-  <button class="btn" id="btn" onclick="startScrape()" style="width:100%;margin-top:16px">🚀 Mulai Scrape</button>
+  <label style="margin-top:14px;display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0">
+    <input type="checkbox" id="notify" checked style="width:auto"> Kirim hasil ke Telegram saat selesai
+  </label>
+  <button class="btn" id="btn" onclick="startScrape()" style="width:100%;margin-top:16px">Mulai Scrape</button>
   <div class="status" id="status"></div>
   <div class="progress" id="prog" style="display:none"><i></i></div>
 </div>
-
 <div class="card" id="resultCard" style="display:none">
-  <h4>📊 Hasil Scrape</h4>
-  <div class="meta" id="meta" style="font-size:.75rem;color:var(--dim);margin-bottom:8px"></div>
+  <h5>Hasil Scrape</h5>
+  <div id="meta" style="font-size:.75rem;color:var(--dim);margin-bottom:8px"></div>
   <div style="overflow-x:auto"><table id="tbl"></table></div>
   <div class="actions">
-    <button class="btn sm" onclick="dl('csv')">⬇ CSV</button>
-    <button class="btn sm" onclick="dl('json')">⬇ JSON</button>
-    <button class="btn sm" onclick="dl('xlsx')">⬇ Excel</button>
-    <button class="btn sm tg" onclick="sendTG()">📨 Telegram</button>
+    <button class="btn sm" onclick="dl('csv')">CSV</button>
+    <button class="btn sm" onclick="dl('json')">JSON</button>
+    <button class="btn sm" onclick="dl('xlsx')">Excel</button>
+    <button class="btn sm tg" onclick="sendTG()">Telegram</button>
   </div>
+  <h5>Tanya AI soal data ini</h5>
+  <div style="display:flex;gap:10px">
+    <input id="aiQ" placeholder="contoh: barang paling murah apa?">
+    <button class="btn sm" onclick="askAI()">Tanya</button>
+  </div>
+  <div id="aiResp" style="display:none;margin-top:12px;font-size:.85rem;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:10px;padding:14px;white-space:pre-wrap"></div>
 </div>
 </div>
-
+<div id="tab-bulk" style="display:none">
+<div class="card">
+  <h5>Bulk Queue Scrape</h5>
+  <p style="font-size:.8rem;color:var(--dim);margin:8px 0 16px">Tempel banyak URL (satu per baris, max 100). Diantrikan otomatis, hasil masuk Riwayat.</p>
+  <label>Daftar URL</label>
+  <textarea id="bulkUrls" style="min-height:140px" placeholder="https://situs1.com/produk\nhttps://situs2.com/produk"></textarea>
+  <div class="row3" style="margin-top:14px">
+    <div><label>Mode</label><select id="b-mode"><option value="http">HTTP</option><option value="browser">Browser JS</option><option value="stealth">Stealth</option></select></div>
+    <div><label>Selector</label><input id="b-sel" placeholder=".item .title"></div>
+    <div><label>Pagination per URL</label><input id="b-pag" type="number" value="1" min="1" max="50"></div>
+  </div>
+  <button class="btn" style="width:100%;margin-top:16px" onclick="startBulk()">Antrikan</button>
+</div>
+<div class="card">
+  <h5>Batch Aktif</h5>
+  <div id="bulkList"><div class="empty">Belum ada batch</div></div>
+</div>
+</div>
 <div id="tab-sched" style="display:none">
 <div class="card">
-  <h4>⏰ Auto-Scrape Scheduler</h4>
-  <p style="font-size:.8rem;color:var(--dim);margin:8px 0 16px">Scrape otomatis tiap interval + hasil langsung ke Telegram</p>
+  <h5>Auto-Scrape Scheduler + Diff Notif</h5>
+  <p style="font-size:.8rem;color:var(--dim);margin:8px 0 16px">Scrape otomatis tiap interval. Kalau data berubah dibanding run sebelumnya → notif Telegram.</p>
   <label>URL Target</label><input id="s-url" type="url" placeholder="https://contoh.com">
   <div class="row3" style="margin-top:14px">
     <div><label>Mode</label><select id="s-mode"><option value="http">HTTP</option><option value="browser">Browser JS</option><option value="stealth">Stealth</option></select></div>
-    <div><label>Selector (opsional)</label><input id="s-sel" placeholder=".title"></div>
+    <div><label>Selector</label><input id="s-sel" placeholder=".title"></div>
     <div><label>Interval (menit)</label><input id="s-int" type="number" value="60" min="5"></div>
   </div>
-  <button class="btn" onclick="addSched()" style="width:100%;margin-top:16px">➕ Tambah Schedule</button>
+  <button class="btn" style="width:100%;margin-top:16px" onclick="addSched()">Tambah Schedule</button>
 </div>
-<div class="card"><h4>📋 Schedule Aktif</h4><div id="schedList"><div class="empty">Belum ada schedule</div></div></div>
+<div class="card"><h5>Schedule Aktif</h5><div id="schedList"><div class="empty">Belum ada schedule</div></div></div>
 </div>
-
 <div id="tab-hist" style="display:none">
 <div class="card">
-  <h4>📂 Riwayat Scrape</h4>
-  <div id="histList"><div class="empty">Loading...</div></div>
+  <h5>Riwayat Scrape</h5>
+  <div style="display:flex;gap:10px;margin-top:10px;flex-wrap:wrap">
+    <input id="h-q" placeholder="cari URL..." style="flex:1;min-width:160px" oninput="loadHist()">
+    <select id="h-status" style="width:150px" onchange="loadHist()">
+      <option value="">semua status</option>
+      <option value="done">done</option>
+      <option value="error">error</option>
+      <option value="running">running</option>
+    </select>
+  </div>
+  <div id="histList" style="margin-top:10px"><div class="empty">Loading...</div></div>
 </div>
 </div>
 </div>
-
 <script>
-let job=null;
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');
-  ['scrape','sched','hist'].forEach(n=>document.getElementById('tab-'+n).style.display=t.dataset.t===n?'block':'none');
-  if(t.dataset.t==='hist')loadHist(); if(t.dataset.t==='sched')loadSched();
-});
+let job=null, TOK=localStorage.getItem('sd_token')||'';
+function api(path,opts={}){opts.headers=Object.assign({'X-Token':TOK},opts.headers||{});if(opts.body&&!opts.headers['Content-Type'])opts.headers['Content-Type']='application/json';return fetch(path,opts)}
 function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function pickSel(sel, label){
-  document.getElementById('selector').value = sel;
-  document.getElementById('status').innerHTML = '✅ Selector: ' + label;
-}
-const PRESETS = {
-  bmkg_quake: {url:'https://data.bmkg.go.id/DataMKG/TEWS/gempaterkini.json', mode:'http', selector:'', label:'BMKG Gempa Terkini'},
-  bmkg_auto: {url:'https://data.bmkg.go.id/DataMKG/TEWS/autogempa.json', mode:'http', selector:'', label:'BMKG Gempa M5.6+'},
-  quotes: {url:'https://quotes.toscrape.com', mode:'http', selector:'.quote .text', label:'Quotes'},
-  hn: {url:'https://news.ycombinator.com', mode:'http', selector:'.titleline > a', label:'Hacker News'},
-  wiki: {url:'https://id.wikipedia.org/wiki/Indonesia', mode:'http', selector:'h2, h3', label:'Wikipedia'},
-};
-function applyPreset(){
-  const v = document.getElementById('presetSel').value;
-  if(!v || !PRESETS[v]) return;
-  const p = PRESETS[v];
-  document.getElementById('url').value = p.url;
-  document.getElementById('mode').value = p.mode;
-  document.getElementById('selector').value = p.selector;
-}
-async function stats(){
-  const h=await(await fetch('/api/history')).json();
-  document.getElementById('s-total').textContent=h.length;
-  document.getElementById('s-items').textContent=h.reduce((a,b)=>a+(b.item_count||0),0);
-  const done=h.filter(x=>x.status==='done').length;
-  document.getElementById('s-rate').textContent=h.length?Math.round(done/h.length*100)+'%':'-';
-  return h;
-}
-stats();
-async function startScrape(){
-  const url=document.getElementById('url').value.trim();
-  if(!url){alert('Isi URL dulu ges');return}
-  const btn=document.getElementById('btn');btn.disabled=true;
-  document.getElementById('prog').style.display='block';
-  document.getElementById('status').innerHTML='<span class="spin"></span>Job dikirim, scraping di background...';
-  document.getElementById('resultCard').style.display='none';
-  try{
-    const res=await fetch('/api/scrape',{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({url,mode:document.getElementById('mode').value,
-        selector:document.getElementById('selector').value.trim()||null,
-        prompt:document.getElementById('prompt').value.trim()||null,
-        paginate:+document.getElementById('paginate').value,
-        notify:document.getElementById('notify').checked})});
-    job=await res.json();
-    const poll=setInterval(async()=>{
-      const r=await fetch('/api/history/'+job.id);const d=await r.json();
-      if(d.status==='done'){
-        clearInterval(poll);document.getElementById('prog').style.display='none';
-        document.getElementById('status').innerHTML='✅ Selesai! '+d.item_count+' item terkumpul';
-        renderDetail(job.id,d);document.getElementById('resultCard').style.display='block';
-        btn.disabled=false;stats();
-      }else if(d.status==='error'){
-        clearInterval(poll);document.getElementById('prog').style.display='none';
-        document.getElementById('status').innerHTML='❌ Gagal: '+esc(d.error||'unknown');btn.disabled=false;
-      }
-    },2500);
-  }catch(e){document.getElementById('status').textContent='❌ '+e.message;document.getElementById('prog').style.display='none';btn.disabled=false}
-}
-function renderDetail(id,d){
-  document.getElementById('meta').textContent=(d.mode||'').toUpperCase()+' • '+d.url+' • '+new Date().toLocaleString('id-ID');
-  const tbl=document.getElementById('tbl');tbl.innerHTML='';
-  const data=d.data||[];if(!data.length){tbl.innerHTML='<tr><td class="empty">Tidak ada data</td></tr>';return}
-  if(typeof data[0]==='object'&&data[0]!==null){
-    const keys=Object.keys(data[0]);
-    tbl.innerHTML='<tr>'+keys.map(k=>'<th>'+esc(k)+'</th>').join('')+'</tr>'+
-      data.map(r=>'<tr>'+keys.map(k=>{let v=r[k];if(Array.isArray(v))v=v.join(', ');return '<td title="'+esc(v)+'">'+esc(v)+'</td>'}).join('')+'</tr>').join('');
-  }else{tbl.innerHTML=data.map(x=>'<tr><td>'+esc(x)+'</td></tr>').join('')}
-}
-function dl(fmt){if(!job)return;location.href='/api/download/'+job.id+'?format='+fmt}
-function dlDefault(){if(!job)return;const f=document.getElementById("fmtSel").value;location.href="/api/download/"+job.id+"?format="+f}
-async function sendTG(){
-  if(!job)return;const s=document.getElementById('status');
-  s.innerHTML='<span class="spin"></span>Mengirim...';
-  const r=await(await fetch('/api/telegram/'+job.id,{method:'POST'})).json();
-  s.textContent=r.ok?'✅ Terkirim ke Telegram!':'❌ '+JSON.stringify(r);
-}
-async function loadHist(){
-  const h=await(await fetch('/api/history')).json();
-  document.getElementById('histList').innerHTML=h.length?h.map(x=>
-    `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-      <div style="min-width:0"><div style="font-size:.88rem;color:#eee;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(x.url)}</div>
-      <div style="font-size:.7rem;color:#666;margin-top:2px">${x.mode.toUpperCase()} • ${x.created_at}</div></div>
-      <div style="display:flex;gap:8px;align-items:center;flex-shrink:0">
-        <span class="pill ${x.status}">${x.status}</span>
-        <span style="font-size:.8rem;color:var(--dim)">${x.item_count} item</span>
-        <button class="btn sm danger" onclick="delH(${x.id})">🗑</button></div>
-    </div>`).join(''):'<div class="empty">Belum ada riwayat</div>';
-}
-async function delH(id){if(!confirm('Hapus riwayat ini?'))return;await fetch('/api/history/'+id,{method:'DELETE'});loadHist()}
-async function loadSched(){
-  const s=await(await fetch('/api/schedules')).json();
-  document.getElementById('schedList').innerHTML=s.length?s.map(x=>
-    `<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)">
-      <div style="min-width:0"><div style="font-size:.88rem">${esc(x.url)}</div>
-      <div style="font-size:.7rem;color:#666">tiap ${x.interval_min} menit • ${x.mode} • last: ${x.last_run||'belum jalan'}</div></div>
-      <button class="btn sm danger" onclick="delS(${x.id})">🗑</button></div>`).join(''):'<div class="empty">Belum ada schedule</div>';
-}
-async function addSched(){
-  const url=document.getElementById('s-url').value.trim();if(!url){alert('Isi URL');return}
-  await fetch('/api/schedules',{method:'POST',headers:{'Content-Type':'application/json'},
-    body:JSON.stringify({url,mode:document.getElementById('s-mode').value,
-      selector:document.getElementById('s-sel').value.trim()||null,
-      interval_min:+document.getElementById('s-int').value})});
-  loadSched();
-}
-async function delS(id){await fetch('/api/schedules/'+id,{method:'DELETE'});loadSched()}
+function toast(msg,type){const t=document.createElement('div');t.className='toast '+(type||'');t.textContent=msg;document.getElementById('toasts').appendChild(t);setTimeout(()=>t.remove(),3500)}
+function deepToggle(){document.getElementById('deepBox').style.display=document.getElementById('deepChk').checked?'block':'none'}
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));t.classList.add('on');['scrape','bulk','sched','hist'].forEach(n=>document.getElementById('tab-'+n).style.display=t.dataset.t===n?'block':'none');if(t.dataset.t==='hist')loadHist();if(t.dataset.t==='sched')loadSched();if(t.dataset.t==='bulk')loadBulks()});
+document.getElementById('mode').addEventListener('change',e=>{document.getElementById('cookieBox').style.display=e.target.value==='social'?'block':'none'});
+async function doAuth(){const v=document.getElementById('tokIn').value.trim();if(!v)return toast('Isi token dulu','err');const r=await fetch('/api/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({token:v})});if(r.ok){TOK=v;localStorage.setItem('sd_token',v);boot()}else toast('Token salah','err')}
+function logout(){localStorage.removeItem('sd_token');TOK='';location.reload()}
+async function stats(){try{const h=await(await api('/api/stats')).json();document.getElementById('s-total').textContent=h.total;document.getElementById('s-items').textContent=h.items;document.getElementById('s-done').textContent=h.done;document.getElementById('s-chg').textContent=h.changed}catch(e){}}
+async function startScrape(){const url=document.getElementById('url').value.trim();if(!url){toast('Isi URL dulu','err');return}const btn=document.getElementById('btn');btn.disabled=true;document.getElementById('prog').style.display='block';document.getElementById('status').innerHTML='<span class="spin"></span>Job dikirim, scraping di background...';document.getElementById('resultCard').style.display='none';try{const res=await api('/api/scrape',{method:'POST',body:JSON.stringify({url,mode:document.getElementById('mode').value,selector:document.getElementById('selector').value.trim()||null,prompt:document.getElementById('prompt').value.trim()||null,paginate:+document.getElementById('paginate').value,notify:document.getElementById('notify').checked,cookies:document.getElementById('cookies').value.trim()||null,deep:document.getElementById('deepChk').checked,link_selector:document.getElementById('linkSel').value.trim()||null,max_links:+document.getElementById('maxLinks').value||50})});if(res.status===401){toast('Token invalid, login ulang','err');btn.disabled=false;return}job=await res.json();const poll=setInterval(async()=>{const r=await api('/api/history/'+job.id);if(r.status===401){clearInterval(poll);return}const d=await r.json();if(d.status==='done'){clearInterval(poll);document.getElementById('prog').style.display='none';document.getElementById('status').innerHTML='✅ Selesai! '+d.item_count+' item'+(d.changed?' <span class="chg">⚡ data berubah</span>':'');renderDetail(job.id,d);document.getElementById('resultCard').style.display='block';btn.disabled=false;stats()}else if(d.status==='error'){clearInterval(poll);document.getElementById('prog').style.display='none';document.getElementById('status').innerHTML='❌ Gagal: '+esc(d.error||'unknown');btn.disabled=false}},2500)}catch(e){document.getElementById('status').textContent='⚠ '+e.message;document.getElementById('prog').style.display='none';btn.disabled=false}}
+function renderDetail(id,d){document.getElementById('meta').textContent=(d.mode||'').toUpperCase()+' '+d.url+' '+new Date().toLocaleString('id-ID');const tbl=document.getElementById('tbl');tbl.innerHTML='';let data=d.data||[];if(typeof data==='object'&&!Array.isArray(data)&&data!==null){const flat=[];['page','detail'].forEach(k=>{(data[k]||[]).forEach(x=>flat.push(x))});if(data.links_followed)flat.push({'info':'link diikuti','jumlah':data.links_followed});data=flat}if(!data.length){tbl.innerHTML='<tr><td class="empty">Tidak ada data</td></tr>';return}if(typeof data[0]==='object'&&data[0]!==null){const keys=Object.keys(data[0]);tbl.innerHTML='<tr>'+keys.map(k=>'<th>'+esc(k)+'</th>').join('')+'</tr>'+data.map(r=>'<tr>'+keys.map(k=>{let v=r[k];if(Array.isArray(v))v=v.join(', ');return '<td title="'+esc(v)+'">'+esc(v)+'</td>'}).join('')+'</tr>').join('')}else{tbl.innerHTML=data.map(x=>'<tr><td>'+esc(x)+'</td></tr>').join('')}}
+function dl(fmt){if(!job)return;location.href='/api/download/'+job.id+'?format='+fmt+'&token='+encodeURIComponent(TOK)}
+async function sendTG(){if(!job)return;const r=await(await api('/api/telegram/'+job.id,{method:'POST'})).json();toast(r.ok?'Terkirim ke Telegram!':'Gagal kirim',r.ok?'ok':'err')}
+async function askAI(){if(!job)return;const q=document.getElementById('aiQ').value.trim();if(!q)return toast('Ketik pertanyaannya dulu','err');const respBox=document.getElementById('aiResp');respBox.style.display='block';respBox.innerHTML='<span class="spin"></span> Menganalisa data...';try{const r=await api('/api/analyze/'+job.id,{method:'POST',body:JSON.stringify({prompt:q})});const d=await r.json();if(d.answer){respBox.innerHTML='<b>Jawaban AI:</b><br>'+esc(d.answer).replace(/\n/g,'<br>');toast('Analisa selesai','ok')}else{respBox.innerHTML='<span style="color:var(--err)">Gagal: '+esc(d.error)+'</span>';toast('AI Error','err')}}catch(e){respBox.innerHTML='<span style="color:var(--err)">Error: '+esc(e.message)+'</span>'}}
+async function startBulk(){const raw=document.getElementById('bulkUrls').value.trim();if(!raw)return toast('Tempel URL dulu','err');const urls=raw.split(/\n+/).map(x=>x.trim()).filter(Boolean);if(!urls.length)return toast('URL ga valid','err');const r=await api('/api/bulk',{method:'POST',body:JSON.stringify({urls,mode:document.getElementById('b-mode').value,selector:document.getElementById('b-sel').value.trim()||null,paginate:+document.getElementById('b-pag').value||1})});if(r.status===401)return toast('Token invalid','err');const d=await r.json();toast('Batch #'+d.batch_id+' diantrikan ('+d.total+' URL)','ok');document.getElementById('bulkUrls').value='';loadBulks()}
+async function loadBulks(){const s=await(await api('/api/batches')).json();document.getElementById('bulkList').innerHTML=s.length?s.map(x=>{const pct=x.total?Math.round(x.done/x.total*100):0;return '<div style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="display:flex;justify-content:space-between;align-items:center"><div style="font-size:.88rem">Batch #'+x.id+' <span class="pill '+x.status+'">'+x.status+'</span></div><div style="font-size:.75rem;color:var(--dim)">'+x.done+'/'+x.total+' · '+x.created_at+'</div></div><div class="progress" style="margin-top:8px"><i style="width:'+pct+'%;animation:none"></i></div></div>'}).join(''):'<div class="empty">Belum ada batch</div>'}
+async function loadHist(){const q=document.getElementById('h-q').value.trim(),st=document.getElementById('h-status').value;const h=await(await api('/api/history?q='+encodeURIComponent(q)+'&status='+st)).json();document.getElementById('histList').innerHTML=h.length?h.map(x=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="min-width:0"><div style="font-size:.88rem;color:#eee;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+esc(x.url)+'</div><div style="font-size:.7rem;color:#666;margin-top:2px">'+x.mode.toUpperCase()+' '+x.created_at+'</div></div><div style="display:flex;gap:8px;align-items:center;flex-shrink:0">'+(x.changed?'<span class="chg">⚡</span>':'')+'<span class="pill '+x.status+'">'+x.status+'</span><span style="font-size:.8rem;color:var(--dim)">'+x.item_count+' item</span><button class="btn sm ghost" onclick="viewH('+x.id+')">Lihat</button><button class="btn sm danger" onclick="delH('+x.id+')">Hapus</button></div></div>').join(''):'<div class="empty">Belum ada riwayat</div>'}
+async function viewH(id){const r=await api('/api/history/'+id);if(r.status===401)return toast('Token invalid','err');const d=await r.json();job={id:id};renderDetail(id,d);document.getElementById('resultCard').style.display='block';document.querySelector('.tab[data-t="scrape"]').click();window.scrollTo(0,0)}
+async function delH(id){if(!confirm('Hapus riwayat ini?'))return;await api('/api/history/'+id,{method:'DELETE'});loadHist();stats()}
+async function loadSched(){const s=await(await api('/api/schedules')).json();document.getElementById('schedList').innerHTML=s.length?s.map(x=>'<div style="display:flex;justify-content:space-between;align-items:center;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.05)"><div style="min-width:0"><div style="font-size:.88rem">'+esc(x.url)+'</div><div style="font-size:.7rem;color:#666">tiap '+x.interval_min+' menit · '+x.mode+' · last: '+(x.last_run||'belum jalan')+'</div></div><button class="btn sm danger" onclick="delS('+x.id+')">Hapus</button></div>').join(''):'<div class="empty">Belum ada schedule</div>'}
+async function addSched(){const url=document.getElementById('s-url').value.trim();if(!url){toast('Isi URL','err');return}await api('/api/schedules',{method:'POST',body:JSON.stringify({url,mode:document.getElementById('s-mode').value,selector:document.getElementById('s-sel').value.trim()||null,interval_min:+document.getElementById('s-int').value})});toast('Schedule ditambah','ok');loadSched()}
+async function delS(id){await api('/api/schedules/'+id,{method:'DELETE'});loadSched()}
+async function boot(){if(!TOK){document.getElementById('authScreen').style.display='flex';return}try{const r=await api('/api/stats');if(r.status===401){document.getElementById('authScreen').style.display='flex';return}document.getElementById('authScreen').style.display='none';document.getElementById('app').style.display='block';stats();setInterval(stats,15000)}catch(e){document.getElementById('authScreen').style.display='flex'}}
+document.getElementById('tokIn').addEventListener('keydown',e=>{if(e.key==='Enter')doAuth()});
+boot();
 </script>
 </body>
 </html>
